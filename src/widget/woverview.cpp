@@ -45,6 +45,7 @@ WOverview::WOverview(const char *pGroup, UserSettingsPointer pConfig, QWidget* p
         m_endOfTrack(false),
         m_bDrag(false),
         m_iPos(0),
+        m_orientation(Qt::Horizontal),
         m_a(1.0),
         m_b(0.0),
         m_dAnalyzerProgress(1.0),
@@ -94,8 +95,8 @@ void WOverview::setup(const QDomNode& node, const SkinContext& context) {
 
     for (int i = 0; i < m_marks.size(); ++i) {
         const WaveformMarkPointer& mark = m_marks[i];
-        if (mark->m_pPointCos) {
-            mark->m_pPointCos->connectValueChanged(this,
+        if (mark->isValid()) {
+            mark->connectSamplePositionChanged(this,
                     SLOT(onMarkChanged(double)));
         }
     }
@@ -424,10 +425,10 @@ void WOverview::paintEvent(QPaintEvent * /*unused*/) {
             for (int i = 0; i < m_marks.size(); ++i) {
                 const WaveformMarkPointer currentMark = m_marks[i];
                 const WaveformMarkProperties& markProperties = currentMark->getProperties();
-                if (currentMark->m_pPointCos && currentMark->m_pPointCos->get() >= 0.0) {
+                if (currentMark->isValid() && currentMark->getSamplePosition() >= 0.0) {
                     //const float markPosition = 1.0 +
                     //        (currentMark.m_pointControl->get() / (float)m_trackSamplesControl->get()) * (float)(width()-2);
-                    const float markPosition = offset + currentMark->m_pPointCos->get() * gain;
+                    const float markPosition = offset + currentMark->getSamplePosition() * gain;
 
                     QLineF line;
                     if (m_orientation == Qt::Horizontal) {

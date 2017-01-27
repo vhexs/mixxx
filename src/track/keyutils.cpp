@@ -1,11 +1,3 @@
-// Horrible Hack to workaround QT 4.8 bug with MSVC compiler. lp:1627826
-// QT 4.8 explicitely disable Initializer lists, but initializer lists is
-// supported with MSVC 2013 SP2 +
-// http://code.qt.io/cgit/qt/qt.git/tree/src/corelib/global/qglobal.h#n910
-// TODO(XXX): Remove after QT4 deprecation, unneeded with QT5
-#if _MSC_VER >= 1800 /* MSVS 2013 */
-  #define Q_COMPILER_INITIALIZER_LISTS
-#endif /* MSVS 2013 */
 #include <QtDebug>
 #include <QMap>
 #include <QMutexLocker>
@@ -343,6 +335,14 @@ ChromaticKey KeyUtils::keyFromNumericValue(double value) {
     }
 
     return static_cast<ChromaticKey>(value_floored);
+}
+
+KeyUtils::KeyNotation KeyUtils::keyNotationFromNumericValue(double value) {
+    int value_floored = static_cast<int>(value);
+    if (value_floored < 0 || value_floored >= KEY_NOTATION_MAX) {
+        return INVALID;
+    }
+    return static_cast<KeyNotation>(value_floored);
 }
 
 // static
